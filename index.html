@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocal Remover - Trình Tách Lời Bài Hát</title>
+    <meta name="description"
+        content="Công cụ trực tuyến giúp xóa giọng hát khỏi bài nhạc và giữ lại âm thanh nền (nhạc beat) ngay trên trình duyệt của bạn.">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="background-effects">
+        <div class="glow blob-1"></div>
+        <div class="glow blob-2"></div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <header class="header">
+                <div class="logo">
+                    <i class="fa-solid fa-music"></i>
+                </div>
+                <h1>Vocal Remover</h1>
+                <p>Lấy nhạc nền bằng cách xóa giọng ca sĩ khỏi bài hát của bạn.</p>
+                <div class="badge">Hoạt động hoàn toàn trên trình duyệt, không lưu máy chủ!</div>
+            </header>
+
+            <main>
+                <div class="upload-area" id="drop-zone">
+                    <input type="file" id="audio-upload" accept="audio/*, video/*" hidden>
+                    <div class="upload-content">
+                        <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                        <h3>Kéo thả tệp âm thanh vào đây</h3>
+                        <p>hoặc</p>
+                        <button class="btn-primary" onclick="document.getElementById('audio-upload').click()">Duyệt
+                            tệp</button>
+                        <span class="file-info">Hỗ trợ: MP3, WAV, FLAC, M4A...</span>
+                    </div>
+                </div>
+
+                <div id="status-container" class="status-container hidden">
+                    <div class="loader"></div>
+                    <p id="status-text">Đang xử lý...</p>
+                </div>
+
+                <div id="result-section" class="result-section hidden">
+                    <h2 class="section-title">Kết quả</h2>
+
+                    <div class="player-card">
+                        <div class="player-header">
+                            <i class="fa-solid fa-headphones"></i> Nhạc gốc
+                        </div>
+                        <audio id="original-player" controls></audio>
+                    </div>
+
+                    <div class="player-card highlight">
+                        <div class="player-header">
+                            <i class="fa-solid fa-compact-disc"></i> Nhạc nền (Đã tách lời)
+                        </div>
+                        <audio id="processed-player" controls></audio>
+                        <a id="download-btn" class="btn-download">
+                            <i class="fa-solid fa-download"></i> Tải Beat (WAV)
+                        </a>
+                    </div>
+
+                    <div class="player-card highlight-vocal">
+                        <div class="player-header">
+                            <i class="fa-solid fa-microphone-lines"></i> Giọng hát (Tương đối)
+                        </div>
+                        <audio id="vocal-player" controls></audio>
+                        <a id="download-vocal-btn" class="btn-download btn-download-vocal">
+                            <i class="fa-solid fa-download"></i> Tải Vocals (WAV)
+                        </a>
+                    </div>
+
+                    <button class="btn-secondary" id="reset-btn" onclick="location.reload()">
+                        <i class="fa-solid fa-rotate-right"></i> Tách bài khác
+                    </button>
+                </div>
+            </main>
+
+            <footer>
+                <p>Lưu ý: Công cụ sử dụng phương pháp triệt tiêu pha (Phase Cancellation) để xóa các âm thanh nằm ở giữa
+                    (thường là giọng hát). Hiệu quả tốt nhất với các bài hát stereo chất lượng cao.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
