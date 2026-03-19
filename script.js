@@ -1,5 +1,6 @@
 let originalAudioBuffer = null;
 let processedAudioBuffer = null;
+let vocalAudioBuffer = null;
 let audioContext = null;
 
 const fileInput = document.getElementById('audio-upload');
@@ -8,7 +9,9 @@ const statusContainer = document.getElementById('status-container');
 const statusText = document.getElementById('status-text');
 const originalPlayer = document.getElementById('original-player');
 const processedPlayer = document.getElementById('processed-player');
+const vocalPlayer = document.getElementById('vocal-player');
 const downloadBtn = document.getElementById('download-btn');
+const downloadVocalBtn = document.getElementById('download-vocal-btn');
 const resultSection = document.getElementById('result-section');
 
 // Event Listeners for Drag and Drop
@@ -80,7 +83,16 @@ async function handleFile(file) {
         
         // Setup download button
         downloadBtn.href = processedUrl;
-        downloadBtn.download = `karaoke_beat_${file.name.replace(/\.[^/.]+$/, "")}.wav`;
+        downloadBtn.download = `xong nhé.beat.${file.name.replace(/\.[^/.]+$/, "")}.wav`;
+
+        // Create wave blob for vocal player
+        const vocalWavBlob = bufferToWave(vocalAudioBuffer, vocalAudioBuffer.length);
+        const vocalUrl = URL.createObjectURL(vocalWavBlob);
+        vocalPlayer.src = vocalUrl;
+        
+        // Setup download button for vocal
+        downloadVocalBtn.href = vocalUrl;
+        downloadVocalBtn.download = `xong nhé.vocal.${file.name.replace(/\.[^/.]+$/, "")}.wav`;
         
         // Hide status, show results
         statusContainer.classList.add('hidden');
@@ -110,6 +122,7 @@ async function processAudio() {
 
     // Create a new empty buffer for the processed result
     processedAudioBuffer = audioContext.createBuffer(2, length, sampleRate);
+    vocalAudioBuffer = audioContext.createBuffer(2, length, sampleRate);
     
     const leftChannel = originalAudioBuffer.getChannelData(0);
     const rightChannel = originalAudioBuffer.getChannelData(1);
@@ -117,15 +130,24 @@ async function processAudio() {
     const outLeft = processedAudioBuffer.getChannelData(0);
     const outRight = processedAudioBuffer.getChannelData(1);
 
-    // Apply Out Of Phase Stereo (OOPS) effect
-    // By doing (Left - Right) / 2, any signal that is panned precisely in the center
-    // (which is typically vocals, bass, and kick drum) will cancel itself out.
+    const vLeft = vocalAudioBuffer.getChannelData(0);
+    const vRight = vocalAudioBuffer.getChannelData(1);
+
+    // Apply Out Of Phase Stereo (OOPS) effect for beat
+    // Apply Center Extraction (Mid) for vocals
     for (let i = 0; i < length; i++) {
-        const diff = (leftChannel[i] - rightChannel[i]) / 2;
-        
-        // Write the pure difference to both channels to keep it sounding balanced
+        const l = leftChannel[i];
+        const r = rightChannel[i];
+
+        // Beat: (L - R) / 2 (removes center pan)
+        const diff = (l - r) / 2;
         outLeft[i] = diff;
         outRight[i] = diff;
+
+        // Vocals: (L + R) / 2 (extracts center pan, though retains some side frequencies)
+        const mid = (l + r) / 2;
+        vLeft[i] = mid;
+        vRight[i] = mid;
     }
     
     return Promise.resolve();
